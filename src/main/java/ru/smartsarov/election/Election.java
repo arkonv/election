@@ -34,7 +34,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import ru.smartsarov.election.db.SQLiteDB;
-import ru.smartsarov.election.db.UikHtml;
+import ru.smartsarov.election.db.UikHtml2;
 import ru.smartsarov.election.uik.Uik;
 import ru.smartsarov.geocoder.GeoAddress;
 import ru.smartsarov.geocoder.Geocoder;
@@ -98,11 +98,11 @@ public class Election {
 			String json = Jsoup.connect(cityUiks).ignoreContentType(true).get().text();
 			Gson gson = new GsonBuilder().create();
 
-			List<UikHtml> uikHtml = gson.fromJson(json, new TypeToken<List<UikHtml>>(){}.getType());
-			int[] uikNumbers = new int[uikHtml.size()];
+			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
+			int[] uikNumbers = new int[uikHtml2.size()];
 
-			for (int i = 0; i < uikHtml.size(); i++) {
-				String text = uikHtml.get(i).getText();
+			for (int i = 0; i < uikHtml2.size(); i++) {
+				String text = uikHtml2.get(i).getText();
 				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
 			}
 			resp = getUiksString(region, uikNumbers);
@@ -122,11 +122,11 @@ public class Election {
 			String json = Jsoup.connect(DUBNA_UIKS).ignoreContentType(true).get().text();
 			Gson gson = new GsonBuilder().create();
 
-			List<UikHtml> uikHtml = gson.fromJson(json, new TypeToken<List<UikHtml>>(){}.getType());
-			int[] uikNumbers = new int[uikHtml.size()];
+			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
+			int[] uikNumbers = new int[uikHtml2.size()];
 
-			for (int i = 0; i < uikHtml.size(); i++) {
-				String text = uikHtml.get(i).getText();
+			for (int i = 0; i < uikHtml2.size(); i++) {
+				String text = uikHtml2.get(i).getText();
 				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
 			}
 			resp = getUiksString(MOSCOW_REGION, uikNumbers);
@@ -138,7 +138,7 @@ public class Election {
 		return Response.status(Response.Status.OK).entity(resp).build();
 	}
 
-	
+
 	@GET
 	@Path("/{city}/uiks/html")
 	public Response getUiksHtml(@PathParam("city") String city) {
@@ -172,23 +172,23 @@ public class Election {
 			Gson gson = new GsonBuilder().create();
 			StringBuilder sb = new StringBuilder();
 			
-			List<UikHtml> uikHtml = gson.fromJson(json, new TypeToken<List<UikHtml>>(){}.getType());
-			int[] uikNumbers = new int[uikHtml.size()];
+			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
+			int[] uikNumbers = new int[uikHtml2.size()];
 
-			for (int i = 0; i < uikHtml.size(); i++) {
-				String text = uikHtml.get(i).getText();
+			for (int i = 0; i < uikHtml2.size(); i++) {
+				String text = uikHtml2.get(i).getText();
 				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
-				uikHtml.get(i).setUikNumber(uikNumbers[i]);
-				uikHtml.get(i).setCikHtml(Jsoup.connect(CIKRF_UIK_INFO_URL)
-						.data("uik", String.valueOf(uikHtml.get(i).getUikNumber()))
+				uikHtml2.get(i).setUikNumber(uikNumbers[i]);
+				uikHtml2.get(i).setCikHtml(Jsoup.connect(CIKRF_UIK_INFO_URL)
+						.data("uik", String.valueOf(uikHtml2.get(i).getUikNumber()))
 						.data("subject", String.valueOf(region))
 						.post().toString());
-				String vyboryIzbirkomUikUrl = vybboryIzbirkomUrl + uikHtml.get(i).getVyboryIzbirkomUikId();
-				uikHtml.get(i).setVyboryIzbirkomUikUrl(vyboryIzbirkomUikUrl);
-				uikHtml.get(i).setVyboryIzbirkomUikHtml(Jsoup.connect(vyboryIzbirkomUikUrl).get().select(".center-colm").outerHtml());
+				String vyboryIzbirkomUikUrl = vybboryIzbirkomUrl + uikHtml2.get(i).getVyboryIzbirkomUikId();
+				uikHtml2.get(i).setVyboryIzbirkomUikUrl(vyboryIzbirkomUikUrl);
+				uikHtml2.get(i).setVyboryIzbirkomUikHtml(Jsoup.connect(vyboryIzbirkomUikUrl).get().select(".center-colm").outerHtml());
 				
 				sb.append("insert into uik_html(uik_number,cik_uik_html,vybory_izbirkom_uik_id,vybory_izbirkom_uik_url,vybory_izbirkom_uik_html)"
-						+ " values(" + String.valueOf(uikHtml.get(i).getUikNumber()).replace("'", "''") + ",'" + uikHtml.get(i).getCikHtml().replace("'", "''") + "','" + uikHtml.get(i).getVyboryIzbirkomUikId().replace("'", "''") + "','" + uikHtml.get(i).getVyboryIzbirkomUikUrl().replace("'", "''") + "','" + uikHtml.get(i).getVyboryIzbirkomUikHtml().replace("'", "''") + "')").append(";");
+						+ " values(" + String.valueOf(uikHtml2.get(i).getUikNumber()).replace("'", "''") + ",'" + uikHtml2.get(i).getCikHtml().replace("'", "''") + "','" + uikHtml2.get(i).getVyboryIzbirkomUikId().replace("'", "''") + "','" + uikHtml2.get(i).getVyboryIzbirkomUikUrl().replace("'", "''") + "','" + uikHtml2.get(i).getVyboryIzbirkomUikHtml().replace("'", "''") + "')").append(";");
 			}
 
 			// Записываем в таблицу uik_html
