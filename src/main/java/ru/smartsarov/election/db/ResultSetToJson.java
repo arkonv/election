@@ -20,7 +20,25 @@ public class ResultSetToJson {
     }.getType();
 
     public static void queryToJson(Writer writer, /*String connectionProperties,*/ String query, String indent, boolean closeWriter) {
-        Connection conn = null;
+        try {
+			queryToJson(writer, SQLiteDB.getConnection(), query, indent, closeWriter);
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
+    // TODO переименовать по-человечески
+    public static void dbNameQueryToJson(Writer writer, String dbName, String query, String indent, boolean closeWriter) {
+    	try {
+			queryToJson(writer, SQLiteDB.getConnection(dbName), query, indent, closeWriter);
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    static void queryToJson(Writer writer, Connection conn, String query, String indent, boolean closeWriter) {
         Statement stmt = null;
         GsonBuilder gson = new GsonBuilder();
         JsonWriter jsonWriter = new JsonWriter(writer);
@@ -33,7 +51,6 @@ public class ResultSetToJson {
             //Class.forName(props.getProperty("driver"));
             //conn = openConnection(props);
         	
-        	conn = SQLiteDB.getConnection();
             stmt = conn.createStatement();
 
             gson.create().toJson(QueryHelper.select(stmt, query), RESULT_TYPE, jsonWriter);

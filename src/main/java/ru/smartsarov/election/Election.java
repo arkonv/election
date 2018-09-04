@@ -2,10 +2,12 @@ package ru.smartsarov.election;
 
 import static ru.smartsarov.election.Constants.CIKRF_UIK_INFO_URL;
 import static ru.smartsarov.election.Constants.DUBNA_DB_NAME;
+import static ru.smartsarov.election.Constants.DUBNA_TIK;
 import static ru.smartsarov.election.Constants.DUBNA_UIKS;
 import static ru.smartsarov.election.Constants.MOSCOW_REGION;
 import static ru.smartsarov.election.Constants.NIZHNY_NOVGOROD_REGION;
 import static ru.smartsarov.election.Constants.SAROV_DB_NAME;
+import static ru.smartsarov.election.Constants.SAROV_TIK;
 import static ru.smartsarov.election.Constants.SAROV_UIKS;
 import static ru.smartsarov.election.Constants.UIK_BAD_NUMBER_MESSAGE;
 import static ru.smartsarov.election.Constants.UIK_VYBORY_IZBIRKOM_RU_MOSCOW_REGION;
@@ -43,24 +45,25 @@ import ru.smartsarov.election.db.UikMember;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-public class Election {	
-//	@GET
-//	@Path("/conn")
-//	public Response connectDB() {
-//		String resp = null;
-//		try {
-//			SQLiteDB.getConnection();
-//			return Response.status(Response.Status.OK).entity(resp).build();
-//		/*} catch (ValidationException e) {
-//			return Response.status(Response.Status.BAD_REQUEST).build();
-//		}*/
-//		} catch (Exception e) {
-//			resp = e.getMessage();
-//			e.printStackTrace();
-//			// log error
-//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-//		}
-//	}
+public class Election {
+	
+/*	@GET
+	@Path("/conn")
+	public Response connectDB() {
+		String resp = null;
+		try {
+			SQLiteDB.getConnection();
+			return Response.status(Response.Status.OK).entity(resp).build();
+		} catch (ValidationException e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		} catch (Exception e) {
+			resp = e.getMessage();
+			e.printStackTrace();
+			// log error
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}*/
 	
 	// TODO доработать под конкретный УИК
 	@GET
@@ -117,29 +120,29 @@ public class Election {
 		return Response.status(Response.Status.OK).entity(resp).build();
 	}*/
 	
-//	@GET
-//	@Path("/dubna/uiks")
-//	public Response uikDubna() {
-//		String resp = null;
-//		try {
-//			String json = Jsoup.connect(DUBNA_UIKS).ignoreContentType(true).get().text();
-//			Gson gson = new GsonBuilder().create();
-//
-//			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
-//			int[] uikNumbers = new int[uikHtml2.size()];
-//
-//			for (int i = 0; i < uikHtml2.size(); i++) {
-//				String text = uikHtml2.get(i).getText();
-//				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
-//			}
-//			resp = getUiksString(MOSCOW_REGION, uikNumbers);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		return Response.status(Response.Status.OK).entity(resp).build();
-//	}
+/*	@GET
+	@Path("/dubna/uiks")
+	public Response uikDubna() {
+		String resp = null;
+		try {
+			String json = Jsoup.connect(DUBNA_UIKS).ignoreContentType(true).get().text();
+			Gson gson = new GsonBuilder().create();
+
+			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
+			int[] uikNumbers = new int[uikHtml2.size()];
+
+			for (int i = 0; i < uikHtml2.size(); i++) {
+				String text = uikHtml2.get(i).getText();
+				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
+			}
+			resp = getUiksString(MOSCOW_REGION, uikNumbers);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return Response.status(Response.Status.OK).entity(resp).build();
+	}*/
 
 	@GET
 	@Path("/{city}/uiks")
@@ -150,15 +153,26 @@ public class Election {
 //		//gson.serializeNulls();
 //		String uiksString = gson.toJson(uiks, new TypeToken<List<Uik>>(){}.getType());
 		
-		String ret = null;
+		String resp = null;
+		String dbName = null;
     	try {
-    		ret = SQLiteDB.getUiks();
+    		switch (city) {
+    		case "sarov":
+    			dbName = SAROV_DB_NAME;
+    			break;
+    		case "dubna":
+    			dbName = DUBNA_DB_NAME;
+    			break;
+    		default:
+    			resp = "Указан неверный город";
+    			return Response.status(Response.Status.OK).entity(resp).build();
+    		}
+    		
+    		resp = SQLiteDB.getUiksFromDB(dbName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	return Response.status(Response.Status.OK).entity(ret).build();
-		
-		//return Response.status(Response.Status.OK).entity(uiksString).build();
+    	return Response.status(Response.Status.OK).entity(resp).build();
 	}
 	
 	@GET
@@ -166,6 +180,7 @@ public class Election {
 	public Response uiks2db(@PathParam("city") String city) {
 		String resp = null;
 		String cityUiks = null;
+		String cityTik = null;
 		int region;
 		String vybboryIzbirkomUrl = null;
 		String dbName = null;
@@ -173,12 +188,14 @@ public class Election {
 		switch (city) {
 		case "sarov":
 			cityUiks = SAROV_UIKS;
+			cityTik = SAROV_TIK;
 			region = NIZHNY_NOVGOROD_REGION;
 			vybboryIzbirkomUrl = UIK_VYBORY_IZBIRKOM_RU_NNOV;
 			dbName = SAROV_DB_NAME;
 			break;
 		case "dubna":
 			cityUiks = DUBNA_UIKS;
+			cityTik = DUBNA_TIK;
 			region = MOSCOW_REGION;
 			vybboryIzbirkomUrl = UIK_VYBORY_IZBIRKOM_RU_MOSCOW_REGION;
 			dbName = DUBNA_DB_NAME;
@@ -187,6 +204,8 @@ public class Election {
 			resp = "Указан неверный город";
 			return Response.status(Response.Status.OK).entity(resp).build();
 		}
+		
+		// ТИК 
 		
 		try {
 			String json = Jsoup.connect(cityUiks).ignoreContentType(true).get().text();
@@ -197,6 +216,12 @@ public class Election {
 			// 1. Получаем id и title с vybory.izbirkom.ru/region
 			List<Uik> uiks = gson.fromJson(json, new TypeToken<List<Uik>>(){}.getType());
 			List<ru.smartsarov.election.db.GeoAddress> geoAddresses = new ArrayList<>(uiks.size());
+			
+//			// ТИК
+//			String jsonTik = Jsoup.connect(cityTik).ignoreContentType(true).get().text();
+//			Uik tik = gson.fromJson(jsonTik, Uik.class);
+//			uiks.add(0, tik);
+			
 			int[] uikNumbers = new int[uiks.size()];
 
 			// 2. Делаем post-запрос на http://www.cikrf.ru/services/lk_address/?do=result_uik
@@ -233,10 +258,10 @@ public class Election {
 						uiks.get(i).getUikPhone().replace("'", "''") + "','" +
 						uiks.get(i).getVotingRoomAddress().replace("'", "''") + "','" +
 						uiks.get(i).getVotingRoomPhone().replace("'", "''") + "'," +
-						String.valueOf(uiks.get(i).getGeoAddressId()) + ",'" +
-						(uiks.get(i).getEmail() == null ? "null" : uiks.get(i).getEmail().replace("'", "''")) + "','" +
-						uiks.get(i).getTitle().replace("'", "''") + "','" +
-						(uiks.get(i).getExpiryDate() == null ? "null" : uiks.get(i).getExpiryDate().replace("'", "''")) + "','" +
+						String.valueOf(uiks.get(i).getGeoAddressId()) + "," +
+						(uiks.get(i).getEmail() == null ? "null" : ("'" + uiks.get(i).getEmail().replace("'", "''") + "'")) + ",'" +
+						uiks.get(i).getTitle().replace("'", "''") + "'," +
+						(uiks.get(i).getExpiryDate() == null ? "null" : ("'" + uiks.get(i).getExpiryDate().replace("'", "''") + "'")) + ",'" +
 						uiks.get(i).getCikUikHtml().replace("'", "''") + "','" +
 						uiks.get(i).getVyboryIzbirkomUikId().replace("'", "''") + "','" +
 						uiks.get(i).getVyboryIzbirkomUikUrl().replace("'", "''") + "','" +

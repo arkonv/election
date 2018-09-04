@@ -1,32 +1,44 @@
 package ru.smartsarov.election.db;
 
 import java.io.Serializable;
-import javax.persistence.*;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
-/**
- * The persistent class for the "uik_members" database table.
- * 
- */
+import com.google.gson.annotations.Expose;
+
 @Entity
 @Table(name="\"uik_member\"")
 @NamedQuery(name="UikMember.findAll", query="SELECT u FROM UikMember u")
 public class UikMember implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="\"appointment\"", length=2000000000)
-	private String appointment;
-
-	@Column(name="\"full_name\"", length=2000000000)
-	private String fullName;
-
+	@Expose(serialize = false, deserialize = false)
 	@Id
 	@Column(name="\"id\"", nullable=false)
 	private int id;
-
+	
+	// TODO доделать
+	@Expose
+	//@Column(name="\"uik_id\"")
+	private Integer uikNumber;
+	
+	@Expose
+	@Column(name="\"full_name\"", length=2000000000)
+	private String fullName;
+	
+	@Expose
 	@Column(name="\"position\"", length=2000000000)
 	private String position;
-
+	
+	@Expose
+	@Column(name="\"appointment\"", length=2000000000)
+	private String appointment;
+	
+	@Expose(serialize = false, deserialize = false)
 	@Column(name="\"uik_id\"")
 	private int uikId;
 

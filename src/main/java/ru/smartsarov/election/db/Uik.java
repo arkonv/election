@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonWriter;
 @Table(name="\"uik\"")
 @NamedQuery(name="Uik.findAll", query="SELECT u FROM Uik u")
 public class Uik implements Serializable {
+	@Expose(serialize = false, deserialize = false)
 	private static final long serialVersionUID = 1L;
 
 	@Expose(serialize = false, deserialize = false)
@@ -29,52 +30,26 @@ public class Uik implements Serializable {
 	@Column(name="\"id\"", updatable=false)
 	private int id;
 
-	@SerializedName("id")
 	@Expose
-	@Column(name="\"vybory_izbirkom_uik_id\"")
-	private String vyboryIzbirkomUikId;
-
-	@SerializedName("text")
-	@Expose
-	@Column(name="\"title\"")
-	private String title;
+	@Column(name="\"uik_number\"")
+	private Integer uikNumber;
 	
-	@Expose
-	@Column(name="\"cik_uik_html\"")
-	private String cikUikHtml;
-
-	@Expose
-	@Column(name="\"email\"")
-	private String email;
-
-	@Expose
-	@Column(name="\"expiry_date\"")
-	private String expiryDate;
-
-	@Expose
-	@Column(name="\"geo_address_id\"")
-	private int geoAddressId;
-
-	@Expose
-	@Column(name="\"request_uik_number\"")
-	private String requestUikNumber;
-
 	@Expose
 	@Column(name="\"tik_number\"")
 	private String tikNumber;
 
 	@Expose
+	@Column(name="\"request_uik_number\"")
+	private String requestUikNumber;
+	
+	@Expose
 	@Column(name="\"uik_address\"")
 	private String uikAddress;
 
 	@Expose
-	@Column(name="\"uik_number\"")
-	private Integer uikNumber;
-
-	@Expose
 	@Column(name="\"uik_phone\"")
 	private String uikPhone;
-
+	
 	@Expose
 	@Column(name="\"voting_room_address\"")
 	private String votingRoomAddress;
@@ -82,14 +57,46 @@ public class Uik implements Serializable {
 	@Expose
 	@Column(name="\"voting_room_phone\"")
 	private String votingRoomPhone;
+	
+	@Expose(serialize = false, deserialize = false)
+	@Column(name="\"geo_address_id\"")
+	private int geoAddressId;
+	
+	@Expose
+	@Column(name="\"email\"")
+	private String email;
+	
+	@SerializedName("text")
+	@Expose
+	@Column(name="\"title\"")
+	private String title;
+	
+	@Expose
+	@Column(name="\"expiry_date\"")
+	private String expiryDate;
 
 	@Expose
-	@Column(name="\"vybory_izbirkom_uik_html\"")
-	private String vyboryIzbirkomUikHtml;
+	@Column(name="\"cik_uik_html\"")
+	private String cikUikHtml;
 
+	@SerializedName("id")
+	@Expose
+	@Column(name="\"vybory_izbirkom_uik_id\"")
+	private String vyboryIzbirkomUikId;
+	
 	@Expose
 	@Column(name="\"vybory_izbirkom_uik_url\"")
 	private String vyboryIzbirkomUikUrl;
+	
+	@Expose
+	@Column(name="\"vybory_izbirkom_uik_html\"")
+	private String vyboryIzbirkomUikHtml;
+	
+	/*@Transient
+	private BigDecimal lat;
+	
+	@Transient
+	private BigDecimal lng;*/
 
 	public Uik() {
 	}
@@ -221,6 +228,22 @@ public class Uik implements Serializable {
 	public void setVyboryIzbirkomUikUrl(String vyboryIzbirkomUikUrl) {
 		this.vyboryIzbirkomUikUrl = vyboryIzbirkomUikUrl;
 	}
+
+	/*public BigDecimal getLat() {
+		return lat;
+	}
+
+	public void setLat(BigDecimal lat) {
+		this.lat = lat;
+	}
+
+	public BigDecimal getLng() {
+		return lng;
+	}
+
+	public void setLng(BigDecimal lng) {
+		this.lng = lng;
+	}*/
 
 	public String toJsonString() {
 		Gson gson = new GsonBuilder().create();

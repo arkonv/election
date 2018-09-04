@@ -27,6 +27,15 @@ public class QueryHelper {
 
         return records;
     }
+    
+//    public static List<Map<String, UikWithMembers>> selectUikWithMembers(Statement stmt, String query) throws SQLException, ParseException {
+//        ResultSet resultSet = stmt.executeQuery(query);
+//        List<Map<String, UikWithMembers>> records = mapRecords(resultSet);
+//
+//        resultSet.close();
+//
+//        return records;
+//    }
 
     public static List<Map<String, Object>> mapRecords(ResultSet resultSet) throws SQLException, ParseException {
         List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
