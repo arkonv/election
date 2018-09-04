@@ -9,7 +9,7 @@ import javax.persistence.*;
  * 
  */
 @Entity
-@Table(name="\"uik_members\"")
+@Table(name="\"uik_member\"")
 @NamedQuery(name="UikMember.findAll", query="SELECT u FROM UikMember u")
 public class UikMember implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ public class UikMember implements Serializable {
 	@Column(name="\"position\"", length=2000000000)
 	private String position;
 
-	@Column(name="\"uik_id\"", insertable=false, updatable=false)
+	@Column(name="\"uik_id\"")
 	private int uikId;
 
 	//bi-directional many-to-one association to Uik
@@ -37,6 +37,13 @@ public class UikMember implements Serializable {
 //	private Uik uik;
 
 	public UikMember() {
+	}
+	
+	public UikMember(int uikId, String fullName, String position, String appointment) {
+		this.appointment = appointment;
+		this.fullName = fullName;
+		this.position = position;
+		this.uikId = uikId;
 	}
 
 	public String getAppointment() {

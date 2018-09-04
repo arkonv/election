@@ -38,6 +38,14 @@ public class GeoAddress implements Serializable {
 	public GeoAddress() {
 	}
 
+	public GeoAddress(int id, String requestAddress, String fullAddress, BigDecimal lat, BigDecimal lng) {
+		this.fullAddress = fullAddress;
+		this.id = id;
+		this.lat = lat;
+		this.lng = lng;
+		this.requestAddress = requestAddress;
+	}
+
 	public String getFullAddress() {
 		return this.fullAddress;
 	}

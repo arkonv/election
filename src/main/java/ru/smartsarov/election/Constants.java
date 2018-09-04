@@ -9,6 +9,7 @@ public final class Constants {
 	public static final String UIK_BAD_NUMBER_MESSAGE2 = "Информируем Вас, что данные об избирательном участке по введенному Вами адресу места жительства в системе ГАС \"ВЫБОРЫ\" на момент создания запроса отсутствуют.";
 	
 	/**  Саров  **/
+	public static final String SAROV_DB_NAME = "dubna.db";
 	public static final int NIZHNY_NOVGOROD_REGION = 52;
 	public static final String UIK_VYBORY_IZBIRKOM_RU_NNOV = "http://www.nnov.vybory.izbirkom.ru/region/nnov/?action=ik&vrn=";
 	public static final String SAROV_ADDRESS = "Россия, Нижегородская область, Саров, ";
@@ -17,6 +18,7 @@ public final class Constants {
 	public static final String SAROV_UIKS = "http://www.nnov.vybory.izbirkom.ru/region/nnov?action=ikTree&region=52&vrn=4524024146067&onlyChildren=true&id=4524024146067";
 
 	/**  Дубна  **/
+	public static final String DUBNA_DB_NAME = "dubna.db";
 	public static final int MOSCOW_REGION = 50;
 	public static final String UIK_VYBORY_IZBIRKOM_RU_MOSCOW_REGION = "http://www.moscow_reg.vybory.izbirkom.ru/region/moscow_reg/?action=ik&vrn=";
 	public static final String DUBNA_ADDRESS = "Россия, Московская область, Дубна, ";

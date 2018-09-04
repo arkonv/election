@@ -1,93 +1,105 @@
 package ru.smartsarov.election.db;
 
+import static ru.smartsarov.election.Constants.JSON_INDENT;
+
+import java.io.IOException;
 import java.io.Serializable;
-import javax.persistence.*;
-import java.util.List;
+import java.io.StringWriter;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
-/**
- * The persistent class for the "uik" database table.
- * 
- */
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonWriter;
+
 @Entity
 @Table(name="\"uik\"")
 @NamedQuery(name="Uik.findAll", query="SELECT u FROM Uik u")
 public class Uik implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="\"cik_uik_id\"", length=2000000000)
-	private String cikUikId;
-
-	@Column(name="\"cik_uik_url\"", length=2000000000)
-	private String cikUikUrl;
-
-	@Column(name="\"email\"", length=2000000000)
-	private String email;
-
-	@Column(name="\"geo_address_id\"", nullable=false)
-	private int geoAddressId;
-
+	@Expose(serialize = false, deserialize = false)
 	@Id
-	@Column(name="\"id\"", unique=true, nullable=false)
+	@Column(name="\"id\"", updatable=false)
 	private int id;
 
-	@Column(name="\"request_uik_number\"", length=2000000000)
+	@SerializedName("id")
+	@Expose
+	@Column(name="\"vybory_izbirkom_uik_id\"")
+	private String vyboryIzbirkomUikId;
+
+	@SerializedName("text")
+	@Expose
+	@Column(name="\"title\"")
+	private String title;
+	
+	@Expose
+	@Column(name="\"cik_uik_html\"")
+	private String cikUikHtml;
+
+	@Expose
+	@Column(name="\"email\"")
+	private String email;
+
+	@Expose
+	@Column(name="\"expiry_date\"")
+	private String expiryDate;
+
+	@Expose
+	@Column(name="\"geo_address_id\"")
+	private int geoAddressId;
+
+	@Expose
+	@Column(name="\"request_uik_number\"")
 	private String requestUikNumber;
 
-	@Column(name="\"tik_number\"", length=2000000000)
+	@Expose
+	@Column(name="\"tik_number\"")
 	private String tikNumber;
 
-	@Column(name="\"title\"", length=2000000000)
-	private String title;
-
-	@Column(name="\"uik_address\"", length=2000000000)
+	@Expose
+	@Column(name="\"uik_address\"")
 	private String uikAddress;
 
-	@Column(name="\"uik_number\"", length=2000000000)
-	private String uikNumber;
+	@Expose
+	@Column(name="\"uik_number\"")
+	private Integer uikNumber;
 
-	@Column(name="\"uik_phone\"", length=2000000000)
+	@Expose
+	@Column(name="\"uik_phone\"")
 	private String uikPhone;
 
-	@Column(name="\"voting_room_address\"", length=2000000000)
+	@Expose
+	@Column(name="\"voting_room_address\"")
 	private String votingRoomAddress;
 
-	@Column(name="\"voting_room_phone\"", length=2000000000)
+	@Expose
+	@Column(name="\"voting_room_phone\"")
 	private String votingRoomPhone;
 
-	//bi-directional one-to-one association to GeoAddress
-//	@OneToOne
-//	@JoinColumns({
-//		})
-//	private GeoAddress geoAddress;
-//
-//	//bi-directional one-to-one association to UikHtml
-//	@OneToOne
-//	@JoinColumns({
-//		})
-//	private UikHtml uikHtml;
-//
-//	//bi-directional many-to-one association to UikMember
-//	@OneToMany(mappedBy="uik")
-//	private List<UikMember> uikMembers;
-//
-//	public Uik() {
-//	}
+	@Expose
+	@Column(name="\"vybory_izbirkom_uik_html\"")
+	private String vyboryIzbirkomUikHtml;
 
-	public String getCikUikId() {
-		return this.cikUikId;
+	@Expose
+	@Column(name="\"vybory_izbirkom_uik_url\"")
+	private String vyboryIzbirkomUikUrl;
+
+	public Uik() {
 	}
 
-	public void setCikUikId(String cikUikId) {
-		this.cikUikId = cikUikId;
+	public String getCikUikHtml() {
+		return this.cikUikHtml;
 	}
 
-	public String getCikUikUrl() {
-		return this.cikUikUrl;
-	}
-
-	public void setCikUikUrl(String cikUikUrl) {
-		this.cikUikUrl = cikUikUrl;
+	public void setCikUikHtml(String cikUikHtml) {
+		this.cikUikHtml = cikUikHtml;
 	}
 
 	public String getEmail() {
@@ -96,6 +108,14 @@ public class Uik implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getExpiryDate() {
+		return this.expiryDate;
+	}
+
+	public void setExpiryDate(String expiryDate) {
+		this.expiryDate = expiryDate;
 	}
 
 	public int getGeoAddressId() {
@@ -146,11 +166,11 @@ public class Uik implements Serializable {
 		this.uikAddress = uikAddress;
 	}
 
-	public String getUikNumber() {
+	public Integer getUikNumber() {
 		return this.uikNumber;
 	}
 
-	public void setUikNumber(String uikNumber) {
+	public void setUikNumber(Integer uikNumber) {
 		this.uikNumber = uikNumber;
 	}
 
@@ -178,42 +198,40 @@ public class Uik implements Serializable {
 		this.votingRoomPhone = votingRoomPhone;
 	}
 
-//	public GeoAddress getGeoAddress() {
-//		return this.geoAddress;
-//	}
-//
-//	public void setGeoAddress(GeoAddress geoAddress) {
-//		this.geoAddress = geoAddress;
-//	}
-//
-//	public UikHtml getUikHtml() {
-//		return this.uikHtml;
-//	}
-//
-//	public void setUikHtml(UikHtml uikHtml) {
-//		this.uikHtml = uikHtml;
-//	}
-//
-//	public List<UikMember> getUikMembers() {
-//		return this.uikMembers;
-//	}
-//
-//	public void setUikMembers(List<UikMember> uikMembers) {
-//		this.uikMembers = uikMembers;
-//	}
-//
-//	public UikMember addUikMember(UikMember uikMember) {
-//		getUikMembers().add(uikMember);
-//		uikMember.setUik(this);
-//
-//		return uikMember;
-//	}
-//
-//	public UikMember removeUikMember(UikMember uikMember) {
-//		getUikMembers().remove(uikMember);
-//		uikMember.setUik(null);
-//
-//		return uikMember;
-//	}
+	public String getVyboryIzbirkomUikHtml() {
+		return this.vyboryIzbirkomUikHtml;
+	}
 
+	public void setVyboryIzbirkomUikHtml(String vyboryIzbirkomUikHtml) {
+		this.vyboryIzbirkomUikHtml = vyboryIzbirkomUikHtml;
+	}
+
+	public String getVyboryIzbirkomUikId() {
+		return this.vyboryIzbirkomUikId;
+	}
+
+	public void setVyboryIzbirkomUikId(String vyboryIzbirkomUikId) {
+		this.vyboryIzbirkomUikId = vyboryIzbirkomUikId;
+	}
+
+	public String getVyboryIzbirkomUikUrl() {
+		return this.vyboryIzbirkomUikUrl;
+	}
+
+	public void setVyboryIzbirkomUikUrl(String vyboryIzbirkomUikUrl) {
+		this.vyboryIzbirkomUikUrl = vyboryIzbirkomUikUrl;
+	}
+
+	public String toJsonString() {
+		Gson gson = new GsonBuilder().create();
+		StringWriter strOut = new StringWriter();
+		try (JsonWriter jsonWriter = new JsonWriter(strOut)) {
+			jsonWriter.setIndent(JSON_INDENT);
+			gson.toJson(this, getClass(), jsonWriter);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return strOut.toString();
+	}
 }
