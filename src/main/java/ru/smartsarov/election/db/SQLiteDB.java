@@ -148,9 +148,6 @@ public class SQLiteDB {
 				" where uik.id = ? " +
 				" order by uik_member.id";
 		
-//		StringWriter strOut = new StringWriter();
-//		ResultSetToJson.queryToJson(strOut, SQLiteDB.getConnection(dbName), queryUiks, JSON_INDENT, true);
-		
 		/*Statement stmt = conn.createStatement();
 		List<UikWithMembers> uiks = (List<UikWithMembers>) stmt.executeQuery(queryUiks);
 		*/
@@ -199,6 +196,18 @@ public class SQLiteDB {
 				" cast (lng as text) as lng " +
 				" from uik_geo_address " + 
 				" where uik_number = ?";
+		
+		// TODO убрать временное решение по фильтрации нераспознанных адресов геокодером Яндекса
+		if (dbName.equals("dubna.db")) {
+			queryGeoAddress =
+					" select distinct " + 
+					" full_address as fullAddress," +
+					" cast (lat as text) as lat, " +
+					" cast (lng as text) as lng " +
+					" from uik_geo_address " + 
+					" where full_address != 'Россия, Московская область, Дубна' and full_address not like 'Россия, Московская область, городской округ Чехов%' " +
+					" and uik_number = ?";
+		}
 
 		// https://www.baeldung.com/apache-commons-dbutils
 		List<Addr> uiks = null;
@@ -219,24 +228,5 @@ public class SQLiteDB {
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(uiks, new TypeToken<List<Addr>>(){}.getType());
-	}
-
-	@SuppressWarnings("unused")
-	private static String execQuery(String query, boolean closeWriter) {
-		StringWriter strOut = new StringWriter();
-		//PrintWriter writer = new PrintWriter(System.out);
-	    //String dbProps = "/database.properties";
-
-	    ResultSetToJson.queryToJson(strOut, /*dbProps,*/ query, JSON_INDENT, closeWriter);
-	    
-        return strOut.toString();
-	}
-	
-	@SuppressWarnings("unused")
-	private static String execQuery(String dbName, String query, boolean closeWriter) {
-		StringWriter strOut = new StringWriter();
-	    ResultSetToJson.dbNameQueryToJson(strOut, dbName, query, JSON_INDENT, closeWriter);
-	    
-        return strOut.toString();
 	}
 }

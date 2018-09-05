@@ -101,30 +101,6 @@ public class Election {
 
 		return Response.status(Response.Status.OK).entity(resp).build();
 	}*/
-	
-/*	@GET
-	@Path("/dubna/uiks")
-	public Response uikDubna() {
-		String resp = null;
-		try {
-			String json = Jsoup.connect(DUBNA_UIKS).ignoreContentType(true).get().text();
-			Gson gson = new GsonBuilder().create();
-
-			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
-			int[] uikNumbers = new int[uikHtml2.size()];
-
-			for (int i = 0; i < uikHtml2.size(); i++) {
-				String text = uikHtml2.get(i).getText();
-				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
-			}
-			resp = getUiksString(MOSCOW_REGION, uikNumbers);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return Response.status(Response.Status.OK).entity(resp).build();
-	}*/
 
 	@GET
 	@Path("/{city}/uiks")
@@ -157,7 +133,7 @@ public class Election {
     	return Response.status(Response.Status.OK).entity(resp).build();
 	}
 	
-	@GET
+/*	@GET
 	@Path("/{city}/uiks2db")
 	public Response uiks2db(@PathParam("city") String city) {
 		String resp = null;
@@ -187,7 +163,8 @@ public class Election {
 			return Response.status(Response.Status.OK).entity(resp).build();
 		}
 		
-		// ТИК 
+		// TODO ТИК, адрес из uikAddress
+		// УИКи, адрес из votingRoomAddress
 		
 		try {
 			String json = Jsoup.connect(cityUiks).ignoreContentType(true).get().text();
@@ -256,7 +233,7 @@ public class Election {
 			}
 			
 			// Записываем в таблицу uik_html
-			/*List<String> sql = Arrays.asList(sb.toString().split(";"));*/
+			List<String> sql = Arrays.asList(sb.toString().split(";"));
 			resp = String.valueOf(SQLiteDB.execute(dbName, sb.toString()));
 		} catch (IOException | ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
@@ -265,16 +242,16 @@ public class Election {
 		}
 
 		return Response.status(Response.Status.OK).entity(resp).build();
-	}
+	}*/
 	
 	private String uiksToJsonString(int region, int[] uikNumbers) {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 		//gson.serializeNulls();
 		String uiksString = gson.toJson(getUiks(region, uikNumbers), new TypeToken<List<Uik>>(){}.getType());
 		return uiksString;
 	}
 	
-	private void parseCikUikHtml(Uik uik) {
+	/*private void parseCikUikHtml(Uik uik) {
 		Document doc = Jsoup.parse(uik.getCikUikHtml());
 		if (!doc.select(".dotted p:eq(0)").text().equals(UIK_BAD_NUMBER_MESSAGE)) {
 			String[] p = { doc.select(".dotted p:eq(1)").text(), doc.select(".dotted p:eq(2)").text(), doc.select(".dotted p:eq(3)").text(), doc.select(".dotted p:eq(4)").text(), doc.select(".dotted p:eq(5)").text() };
@@ -309,7 +286,7 @@ public class Election {
 		}
 		
 		// TODO получить geoaddress с сайта VyboryIzbirkom
-	}
+	}*/
 	
 	private List<Uik> getUiks(int region, int[] uikNumber) {
 		List<Uik> uiks = new ArrayList<>(uikNumber.length);
