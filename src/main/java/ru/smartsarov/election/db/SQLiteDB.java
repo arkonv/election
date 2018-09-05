@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.dbutils.DbUtils;
@@ -18,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import ru.smartsarov.election.UikGeoAddress;
 import ru.smartsarov.election.uik.UikWithMembers;
 
 public class SQLiteDB {
@@ -154,7 +156,8 @@ public class SQLiteDB {
 		*/
 
 		// https://www.baeldung.com/apache-commons-dbutils
-		// Use the BeanListHandler implementation to convert all ResultSet rows into a List of Person JavaBeans.
+		// Use the BeanListHandler implementation to convert all ResultSet rows into a List of Person JavaBeans
+		// TODO написать обработчик типа java.lang.Double для lat и lng через gson TypeConverter
 		ResultSetHandler<List<UikWithMembers>> h = new BeanListHandler<UikWithMembers>(UikWithMembers.class);
 		List<UikWithMembers> uiks = null;
 		
@@ -167,8 +170,7 @@ public class SQLiteDB {
 			ResultSetHandler<List<UikMember>> h1 = new BeanListHandler<UikMember>(UikMember.class);
 
 			for (UikWithMembers u : uiks) {
-				List<UikMember> uikMembers = run.query(conn, queryUikMembers, h1, String.valueOf(u.getId()));
-				u.setUikMembers(uikMembers);
+				u.setUikMembers(run.query(conn, queryUikMembers, h1, String.valueOf(u.getId())));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -177,12 +179,46 @@ public class SQLiteDB {
 		}
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
-		//gson.serializeNulls();
-		String uiksString = gson.toJson(uiks, new TypeToken<List<UikWithMembers>>(){}.getType());
-		return uiksString;
+		return gson.toJson(uiks, new TypeToken<List<UikWithMembers>>(){}.getType());
 			
 		//return execQuery(dbName, queryUiks, true);
-		//return uiks;
+	}
+	
+	public static String getUiksHousesFromDB(String dbName) throws ClassNotFoundException, SQLException {
+		String queryUiks =
+			" select " +
+			" distinct uik_number as uikNumber " +
+			" from uik_geo_address " +
+			" where uik_number is not null " +
+			" order by uik_number";
+
+		String queryGeoAddress =
+				" select distinct " + 
+				" full_address as fullAddress," +
+				" cast (lat as text) as lat, " +
+				" cast (lng as text) as lng " +
+				" from uik_geo_address " + 
+				" where uik_number = ?";
+
+		// https://www.baeldung.com/apache-commons-dbutils
+		List<Addr> uiks = null;
+		
+		Connection conn = getConnection(dbName);
+		QueryRunner run = new QueryRunner();
+
+		try {
+			uiks = run.query(conn, queryUiks, new BeanListHandler<Addr>(Addr.class));
+			for (Addr u : uiks) {
+				u.setHouses(run.query(conn, queryGeoAddress, new BeanListHandler<GeoAddressDelete>(GeoAddressDelete.class), u.getUikNumber()));
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			DbUtils.close(conn);
+		}
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(uiks, new TypeToken<List<Addr>>(){}.getType());
 	}
 
 	@SuppressWarnings("unused")

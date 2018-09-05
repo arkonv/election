@@ -4,11 +4,6 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-
-/**
- * The persistent class for the "geo_address" database table.
- * 
- */
 @Entity
 @Table(name="\"geo_address\"")
 @NamedQuery(name="GeoAddress.findAll", query="SELECT g FROM GeoAddress g")

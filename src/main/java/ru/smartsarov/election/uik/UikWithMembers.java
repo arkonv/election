@@ -15,16 +15,15 @@ public class UikWithMembers extends Uik {
 	private List<UikMember> uikMembers;
 
 	@Expose
-	private /*BigDecimal*/String lat;
-	
+	private /* BigDecimal */String lat;
+
 	@Expose
-	private /*BigDecimal*/String lng;
+	private /* BigDecimal */String lng;
 
 	public UikWithMembers() {
 		super();
-		
+
 		uikMembers = new LinkedList<>();
-		
 	}
 
 	public List<UikMember> getUikMembers() {

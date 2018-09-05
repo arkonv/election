@@ -7,20 +7,23 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class UikRequest implements Serializable, Iterable<UikRequest> {
-
+	private final static long serialVersionUID = 2326643019323295056L;
+	
 	@SerializedName("id")
 	@Expose
 	private String id;
+	
 	@SerializedName("text")
 	@Expose
 	private String text;
+	
 	@SerializedName("a_attr")
 	@Expose
 	private Aattr aAttr;
+	
 	@SerializedName("children")
 	@Expose
 	private Boolean children;
-	private final static long serialVersionUID = 2326643019323295056L;
 
 	public String getId() {
 		return id;

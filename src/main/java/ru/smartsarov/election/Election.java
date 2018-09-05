@@ -47,24 +47,6 @@ import ru.smartsarov.election.db.UikMember;
 @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 public class Election {
 	
-/*	@GET
-	@Path("/conn")
-	public Response connectDB() {
-		String resp = null;
-		try {
-			SQLiteDB.getConnection();
-			return Response.status(Response.Status.OK).entity(resp).build();
-		} catch (ValidationException e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-		} catch (Exception e) {
-			resp = e.getMessage();
-			e.printStackTrace();
-			// log error
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-		}
-	}*/
-	
 	// TODO доработать под конкретный УИК
 	@GET
 	@Path("/{region}/{uik}")
@@ -167,7 +149,7 @@ public class Election {
     			resp = "Указан неверный город";
     			return Response.status(Response.Status.OK).entity(resp).build();
     		}
-    		
+
     		resp = SQLiteDB.getUiksFromDB(dbName);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -302,7 +284,6 @@ public class Election {
 			uik.setVotingRoomAddress(getPTag(p[3]));
 			uik.setVotingRoomPhone(getPTag(p[4]));
 		}
-		
 	}
 	
 	private void parseVyboryIzbirkomUikHtml(Uik uik, int uikId, List<UikMember> uikMembers) {
@@ -364,79 +345,6 @@ public class Election {
 				e.printStackTrace();
 			}
 		}
-		return uiks;
-	}
-	
-	@GET
-	@Path("/getUikFromFile")
-	public Response getUikFromFile() {
-		String resp = null;		
-		getUiksFromFile("/db/sarov.txt");
-		
-		return Response.status(Response.Status.OK).entity(resp).build();
-	}
-	
-	private List<Uik> getUiksFromFile(String pathFile) {
-		List<Uik> uiks = new ArrayList<>();
-		//String json = null;
-		Gson gson = new GsonBuilder().create();
-	    StringBuilder json = new StringBuilder();
-		
-		java.nio.file.Path path = null;
-		try {
-			path = Paths.get(getClass().getClassLoader().getResource(pathFile).toURI());
-		} catch (URISyntaxException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		/*
-		// 1.
-		File file = new File(pathFile);
-		StringBuilder fileContents = new StringBuilder((int)file.length());
-
-	    //try (Scanner scanner = new Scanner(file)) {
-	    try (Scanner scanner = new Scanner((Readable) new BufferedReader(new FileReader(file)))) {
-	        while(scanner.hasNextLine()) {
-	            fileContents.append(scanner.nextLine());
-	        }
-	        json = fileContents.toString();
-	    } catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	    
-	    // 2.
-	    try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-	    	lines.forEach(line -> data.append(line));
-	    } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    
-	    // 3.
-	    try {
-			String content = new String(Files.readAllBytes(new File(pathFile).toPath()), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-
-	    // 4.
-	    try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-	    	//json.append(reader.lines());
-	    	reader.lines().forEach(line -> json.append(line));
-	    } catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		List<UikGeoAddress> uikGeoAddress = gson.fromJson(json.toString(), new TypeToken<List<UikGeoAddress>>(){}.getType());
-		int[] uikNumbers = new int[uikGeoAddress.size()];
-
-		for (int i = 0; i < uikGeoAddress.size(); i++) {
-			//String text = geoAddressWithUik.get(i).getText();
-			//uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
-		}
-		//resp = getUiksString(NIZHNY_NOVGOROD_REGION, uikNumbers);
-		
 		return uiks;
 	}
 	
