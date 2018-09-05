@@ -18,7 +18,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -249,6 +248,7 @@ public class UikHouses {
 		}
 
 		String str = gson.toJson(geo, new TypeToken<List<UikGeoAddress>>(){}.getType());
+
 		// TODO write to file
 		//java.nio.file.Files.write(Paths.get(getClass().getClassLoader().getResource("houses.txt").toURI()), str.getBytes("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 		
