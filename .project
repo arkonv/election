@@ -34,4 +34,11 @@
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/main/resources/db/sarov.db</name>
+			<type>1</type>
+			<location>G:/Java/workspace-sts-3.9.5/election/src/main/resources/db/sarov.db</location>
+		</link>
+	</linkedResources>
 </projectDescription>

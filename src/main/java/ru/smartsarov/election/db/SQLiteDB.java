@@ -147,10 +147,6 @@ public class SQLiteDB {
 				" join uik on uik.id = uik_member.uik_id " +
 				" where uik.id = ? " +
 				" order by uik_member.id";
-		
-		/*Statement stmt = conn.createStatement();
-		List<UikWithMembers> uiks = (List<UikWithMembers>) stmt.executeQuery(queryUiks);
-		*/
 
 		// https://www.baeldung.com/apache-commons-dbutils
 		// Use the BeanListHandler implementation to convert all ResultSet rows into a List of Person JavaBeans

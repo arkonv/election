@@ -13,14 +13,10 @@ import static ru.smartsarov.election.Constants.UIK_BAD_NUMBER_MESSAGE;
 import static ru.smartsarov.election.Constants.UIK_VYBORY_IZBIRKOM_RU_MOSCOW_REGION;
 import static ru.smartsarov.election.Constants.UIK_VYBORY_IZBIRKOM_RU_NNOV;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -56,63 +52,17 @@ public class Election {
 	}
 
 	// TODO распараллелить этот метод
-/*	@GET
-	@Path("/{city}/uiks")
-	//public Response uikSarov() {
-	public Response getUiks(@PathParam("city") String city) {
-		String resp = null;
-		String cityUiks = null;
-		int region;
-		
-		switch (city) {
-		case "sarov":
-			cityUiks = SAROV_UIKS;
-			region = NIZHNY_NOVGOROD_REGION;
-//			vybboryIzbirkomUrl = UIK_VYBORY_IZBIRKOM_RU_NNOV;
-//			dbName = "sarov.db";
-			break;
-		case "dubna":
-			cityUiks = DUBNA_UIKS;
-			region = NIZHNY_NOVGOROD_REGION;
-//			vybboryIzbirkomUrl = UIK_VYBORY_IZBIRKOM_RU_MOSCOW_REGION;
-//			dbName = "dubna.db";
-			break;
-		default:
-			resp = "Неправильно указан город";
-			return Response.status(Response.Status.OK).entity(resp).build();
-		}
-		
-		try {
-			String json = Jsoup.connect(cityUiks).ignoreContentType(true).get().text();
-			Gson gson = new GsonBuilder().create();
-
-			List<UikHtml2> uikHtml2 = gson.fromJson(json, new TypeToken<List<UikHtml2>>(){}.getType());
-			int[] uikNumbers = new int[uikHtml2.size()];
-
-			for (int i = 0; i < uikHtml2.size(); i++) {
-				String text = uikHtml2.get(i).getText();
-				uikNumbers[i] = Integer.valueOf(text.substring(text.indexOf("№") + 1));
-			}
-			resp = uiksToJsonString(region, uikNumbers);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return Response.status(Response.Status.OK).entity(resp).build();
-	}*/
-
 	@GET
 	@Path("/{city}/uiks")
 	public Response getUiks(@PathParam("city") String city) {
-		
-//		List<Uik> uiks = SQLiteDB.getEntityManager().createNamedQuery("Uik.findAll", Uik.class).getResultList();
-//		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-//		//gson.serializeNulls();
-//		String uiksString = gson.toJson(uiks, new TypeToken<List<Uik>>(){}.getType());
-		
 		String resp = null;
 		String dbName = null;
+		
+		/*List<Uik> uiks = SQLiteDB.getEntityManager().createNamedQuery("Uik.findAll", Uik.class).getResultList();
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+		//gson.serializeNulls();
+		String uiksString = gson.toJson(uiks, new TypeToken<List<Uik>>(){}.getType());*/
+		
     	try {
     		switch (city) {
     		case "sarov":
@@ -133,7 +83,7 @@ public class Election {
     	return Response.status(Response.Status.OK).entity(resp).build();
 	}
 	
-/*	@GET
+	@GET
 	@Path("/{city}/uiks2db")
 	public Response uiks2db(@PathParam("city") String city) {
 		String resp = null;
@@ -203,7 +153,9 @@ public class Election {
 
 				// TODO переделать ru.smartsarov.geocoder.GeoAddress
 				// Собираем данные geocoder'а
-				ru.smartsarov.geocoder.GeoAddress geo = ru.smartsarov.geocoder.Geocoder.geoAddress(uiks.get(i).getUikAddress(), 1).get(0);
+				String address = uiks.get(i).getUikAddress();
+				address = address.substring(0, address.lastIndexOf(","));
+				ru.smartsarov.geocoder.GeoAddress geo = ru.smartsarov.geocoder.Geocoder.geoAddress(address, 1).get(0);
 				geoAddresses.add(new ru.smartsarov.election.db.GeoAddress(i + 1, geo.getRequestAddress(), geo.getFullAddress(), geo.getLat(), geo.getLng()));
 				uiks.get(i).setGeoAddressId(i + 1);
 
@@ -233,7 +185,7 @@ public class Election {
 			}
 			
 			// Записываем в таблицу uik_html
-			List<String> sql = Arrays.asList(sb.toString().split(";"));
+			//List<String> sql = Arrays.asList(sb.toString().split(";"));
 			resp = String.valueOf(SQLiteDB.execute(dbName, sb.toString()));
 		} catch (IOException | ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
@@ -242,52 +194,8 @@ public class Election {
 		}
 
 		return Response.status(Response.Status.OK).entity(resp).build();
-	}*/
-	
-	private String uiksToJsonString(int region, int[] uikNumbers) {
-		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-		//gson.serializeNulls();
-		String uiksString = gson.toJson(getUiks(region, uikNumbers), new TypeToken<List<Uik>>(){}.getType());
-		return uiksString;
 	}
-	
-	/*private void parseCikUikHtml(Uik uik) {
-		Document doc = Jsoup.parse(uik.getCikUikHtml());
-		if (!doc.select(".dotted p:eq(0)").text().equals(UIK_BAD_NUMBER_MESSAGE)) {
-			String[] p = { doc.select(".dotted p:eq(1)").text(), doc.select(".dotted p:eq(2)").text(), doc.select(".dotted p:eq(3)").text(), doc.select(".dotted p:eq(4)").text(), doc.select(".dotted p:eq(5)").text() };
-			uik.setTikNumber(p[0].substring(p[0].length() - 3, p[0].length()));
-			uik.setUikAddress(getPTag(p[1]));
-			uik.setUikPhone(getPTag(p[2]));
-			uik.setVotingRoomAddress(getPTag(p[3]));
-			uik.setVotingRoomPhone(getPTag(p[4]));
-		}
-	}
-	
-	private void parseVyboryIzbirkomUikHtml(Uik uik, int uikId, List<UikMember> uikMembers) {
-		Document doc = Jsoup.parse(uik.getVyboryIzbirkomUikHtml());
-		
-		String email = doc.select("p:eq(6)").text();
-		uik.setEmail((email.endsWith(":") ? null : email.substring(email.lastIndexOf(" ") + 1)));
-		
-		String ed = doc.select("p:eq(7)").text();
-		uik.setExpiryDate(ed.substring(ed.lastIndexOf(" ") + 1));
-		
-		// uik_members
-		//doc.select(".table.margtab p:eq(4)").text();
-		
-		Element table = doc.select("table").get(0); //select the third table.
-		Elements rows = table.select("tr");
 
-		for (int i = 1; i < rows.size(); i++) { //first row is the col names, so skip it.
-		    Element row = rows.get(i);
-		    Elements cols = row.select("td");
-
-		    uikMembers.add(new UikMember(uikId, cols.get(1).text(), cols.get(2).text(), cols.get(3).text()));
-		}
-		
-		// TODO получить geoaddress с сайта VyboryIzbirkom
-	}*/
-	
 	private List<Uik> getUiks(int region, int[] uikNumber) {
 		List<Uik> uiks = new ArrayList<>(uikNumber.length);
 
@@ -323,6 +231,50 @@ public class Election {
 			}
 		}
 		return uiks;
+	}
+	
+	private String uiksToJsonString(int region, int[] uikNumbers) {
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+		//gson.serializeNulls();
+		String uiksString = gson.toJson(getUiks(region, uikNumbers), new TypeToken<List<Uik>>(){}.getType());
+		return uiksString;
+	}
+	
+	private void parseCikUikHtml(Uik uik) {
+		Document doc = Jsoup.parse(uik.getCikUikHtml());
+		if (!doc.select(".dotted p:eq(0)").text().equals(UIK_BAD_NUMBER_MESSAGE)) {
+			String[] p = { doc.select(".dotted p:eq(1)").text(), doc.select(".dotted p:eq(2)").text(), doc.select(".dotted p:eq(3)").text(), doc.select(".dotted p:eq(4)").text(), doc.select(".dotted p:eq(5)").text() };
+			uik.setTikNumber(p[0].substring(p[0].length() - 3, p[0].length()));
+			uik.setUikAddress(getPTag(p[1]));
+			uik.setUikPhone(getPTag(p[2]));
+			uik.setVotingRoomAddress(getPTag(p[3]));
+			uik.setVotingRoomPhone(getPTag(p[4]));
+		}
+	}
+	
+	private void parseVyboryIzbirkomUikHtml(Uik uik, int uikId, List<UikMember> uikMembers) {
+		Document doc = Jsoup.parse(uik.getVyboryIzbirkomUikHtml());
+		
+		String email = doc.select("p:eq(6)").text();
+		uik.setEmail((email.endsWith(":") ? null : email.substring(email.lastIndexOf(" ") + 1)));
+		
+		String ed = doc.select("p:eq(7)").text();
+		uik.setExpiryDate(ed.substring(ed.lastIndexOf(" ") + 1));
+		
+		// uik_members
+		//doc.select(".table.margtab p:eq(4)").text();
+		
+		Element table = doc.select("table").get(0); //select the third table.
+		Elements rows = table.select("tr");
+
+		for (int i = 1; i < rows.size(); i++) { //first row is the col names, so skip it.
+		    Element row = rows.get(i);
+		    Elements cols = row.select("td");
+
+		    uikMembers.add(new UikMember(uikId, cols.get(1).text(), cols.get(2).text(), cols.get(3).text()));
+		}
+		
+		// TODO получить geoaddress с сайта VyboryIzbirkom
 	}
 	
 	private String getPTag(String p) {
